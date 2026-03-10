@@ -26,12 +26,6 @@ random.seed(0)
     help="Where to save the trained tokenizer.",
 )
 @click.option(
-    "--num_bytes",
-    type=int,
-    default=None,
-    help="The maximum number of bytes to use for tokenizer training.",
-)
-@click.option(
     "--corpus_dir",
     type=str,
     default=None,
@@ -51,7 +45,6 @@ random.seed(0)
 )
 def main(
     output_dir: str,
-    num_bytes: int,
     corpus_dir: str,
     vocab_size: int,
     regex_string: str,
@@ -77,7 +70,7 @@ def main(
                 file = re.sub(r"_truncated_\d+", "", file)
                 get_truncated_file(file, wanted_filesize)
     else:
-        train_files, actual_num_bytes = get_files_with_num_bytes(corpus_dir, num_bytes)
+        train_files, actual_num_bytes = get_files_with_num_bytes(corpus_dir, None)
 
         # Write metadata
         with open("meta.json", "w") as fo:

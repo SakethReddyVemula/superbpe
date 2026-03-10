@@ -5,7 +5,10 @@ import random
 from pathlib import Path
 from filelock import FileLock
 
-import simdjson as json
+try:
+    import simdjson as json
+except ImportError:
+    import json
 from tqdm import tqdm
 from tokenizers.models import BPE, Unigram
 
@@ -126,7 +129,8 @@ def get_truncated_file(filepath, wanted_filesize):
         if not os.path.exists(truncated_filepath):
             print(f"Truncating {filepath} to {wanted_filesize} bytes")
 
-            os.system(f"cp {filepath} {truncated_filepath}")
+            import shutil
+            shutil.copy(filepath, truncated_filepath)
 
             # adjust wanted_filesize to the next valid unicode character
             with open(truncated_filepath, "rb") as f:
