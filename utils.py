@@ -63,11 +63,6 @@ def train_or_extend_tokenizer(
             behavior="isolated",
             invert=False,
         ),
-        ByteLevel(
-            add_prefix_space=False,
-            trim_offsets=True,
-            use_regex=False,
-        ),
     ]
     tokenizer.pre_tokenizer = pre_tokenizers.Sequence(pretokenizers)
     tokenizer.train(text_files, trainer)
@@ -189,20 +184,18 @@ def get_files_with_num_bytes(data_dir, num_bytes=None, loop_around=True):
 
 
 def construct_hf_tokenizer(tokenizer_dir):
-    from tokenizers.decoders import ByteLevel
+    from transformers import PreTrainedTokenizerFast
     
     tokenizer_dir = Path(tokenizer_dir)
     base_tokenizer = Tokenizer.from_file(str(tokenizer_dir / "tokenizer.json"))
-    base_tokenizer.decoder = ByteLevel(
-        add_prefix_space=True, trim_offsets=True, use_regex=True
-    )
     eos_token_id = base_tokenizer.get_vocab_size()
     pad_token_id = base_tokenizer.get_vocab_size() + 1
 
-    tokenizer = GPT2TokenizerFast(
+    tokenizer = PreTrainedTokenizerFast(
         tokenizer_object=base_tokenizer,
         eos_token=base_tokenizer.decode([eos_token_id], skip_special_tokens=False),
         pad_token=base_tokenizer.decode([pad_token_id], skip_special_tokens=False),
+        unk_token="[UNK]"
     )
 
     # note: this overwrites tokenizer.json!
